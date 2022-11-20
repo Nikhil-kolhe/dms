@@ -1,0 +1,82 @@
+create table Hotel(Hotel_no int primary key,name varchar(20),address varchar(20));
+create table Room(Room_no int primary key,Hotel_no int,type varchar(20),price int,foreign key(Hotel_no) references Hotel(Hotel_no));
+create table Booking(Hotel_no int,guest_no int primary key,date_from date,date_to date,Room_no int,foreign key (Hotel_no) references Hotel(Hotel_no),foreign key (Room_no) references Room(Room_no));
+create table guest(guest_no int,name varchar(20),address varchar(20),foreign key (guest_no) references Booking(guest_no));
+
+insert into Hotel values(1,"Grosvenor","Paris");
+insert into Hotel values(2,"Marriot","Pune");
+insert into Hotel values(3,"Hyatt","Delhi");
+insert into Hotel values(4,"Taj","Mumbai");
+
+insert into Room values(101,1,"Deluxe",5000);
+insert into Room values(102,1,"Super-Deluxe",8000);
+insert into Room values(103,1,"General",2500);
+insert into Room values(104,1,"Ac-Room",4500);
+insert into Room values(105,1,"Non-AC",5000);
+insert into Room values(201,2,"Ac-Room",4500);
+insert into Room values(202,2,"Deluxe",7500);
+insert into Room values(301,3,"Deluxe",9500);
+insert into Room values(302,3,"Super-Deluxe",11500);
+insert into Room values(401,4,"Super-Deluxe",17500);
+insert into Room values(402,4,"Deluxe",11500);
+
+insert into Booking values(1,1,"2022-11-20","2022-11-25",101);
+insert into Booking values(1,2,"2022-11-05","2022-11-06",102);
+insert into Booking values(1,3,"2022-11-07","2022-11-09",102);
+insert into Booking values(2,4,"2022-11-10","2022-11-15",201);
+insert into Booking values(3,5,"2022-11-15","2022-11-17",301);
+insert into Booking values(4,6,"2022-11-26","2022-11-29",401);
+insert into Booking values(1,7,"2022-11-19","2022-11-22",104);
+
+insert into guest values(1,"Raj","Pune");
+insert into guest values(2,"Saharsh","Mumbai");
+insert into guest values(3,"Tara","Delhi");
+insert into guest values(4,"Priya","Paris");
+insert into guest values(5,"Dheeraj","Goa");
+insert into guest values(6,"Shardul","London");
+insert into guest values(7,"Kushal","Paris");
+
+select price,type from Room where Hotel_no=(select Hotel_no from Hotel where name="Grosvenor");
+
+select guest.guest_no, guest.name, guest.address from guest, Booking, Hotel WHERE guest.guest_no =Booking.guest_no AND Hotel.Hotel_no = Booking.Hotel_no AND (date_from <= CURRENT_DATE AND date_to >= CURRENT_DATE) AND Hotel.name = 'Grosvenor';
+
+SELECT r.* FROM Room r LEFT JOIN
+(SELECT g.name, h.Hotel_no, b.Room_no FROM Guest g, Booking b, Hotel h
+WHERE g.guest_no = b.guest_no AND b.Hotel_no = h.Hotel_no AND
+h.name= 'Grosvenor' AND
+b.date_from <= CURRENT_DATE AND b.date_to >= CURRENT_DATE) AS XXX
+ON r.Hotel_no = XXX.Hotel_no AND r.Room_no = XXX.Room_no;
+
+SELECT SUM(price)
+FROM Booking b, Room r, Hotel h
+WHERE (b.date_from <= CURRENT_DATE
+AND b.date_to >= CURRENT_DATE)
+AND r.Hotel_no = h.Hotel_no
+AND r.Hotel_no = b.Hotel_no
+AND r.Room_no = b.Room_no
+AND h.name = 'Grosvenor';
+
+SELECT h.Hotel_no,r.Hotel_no, r.Room_no, r.type, r.price
+FROM Room r, Hotel h
+WHERE r.Hotel_no = h.Hotel_no AND
+h.name = 'Grosvenor' AND
+Room_no NOT IN
+(SELECT Room_no
+FROM Booking b, Hotel h
+WHERE (date_from <= CURRENT_DATE
+AND date_to >= CURRENT_DATE)
+AND b.Hotel_no=h.Hotel_no
+AND name = 'Grosvenor');
+
+SELECT SUM(price)
+FROM Room r, Hotel h
+WHERE r.Hotel_no = h.Hotel_no AND
+h.name = 'Grosvenor' AND
+Room_no NOT IN
+(SELECT Room_no FROM Booking b, Hotel h
+WHERE (date_from <= CURRENT_DATE
+AND date_to >= CURRENT_DATE) AND
+b.Hotel_no = h.Hotel_no
+AND r.Hotel_no=b.Hotel_no
+AND r.Room_no=b.Room_no
+AND h.name = 'Grosvenor');
