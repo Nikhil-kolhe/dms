@@ -1,0 +1,39 @@
+1.	Create tables for above mentioned  schema by applying constraints.
+ANS:- --
+
+2.	Insert  suitable values in all tables.
+ANS:- --
+
+3.	Add  Mobile No column into the Salesman table using alter command
+ ANS:- ALTER table Salesman
+        ADD Mobile_No int(10);
+
+4.	Display name and commission of all the salesmen.
+ANS:- --
+
+5.	Drop the grade column from customer table.
+ANS:- ALTER table customer
+       DROP column grade;
+
+6.	Change the data type of any one column using alters command.
+ANS:- ALTER table Salesman
+        MODIFY column Mobile_No varchar(10);
+
+7.	Create index on  salesman_id on table order.
+ANS:-   Create INDEX ind_1 ON order (salesman_id);
+
+8.	Create View on Display names and city of salesman, who belongs to the city of Paris.
+ANS:-    Create VIEW v1 AS
+            select names,city
+            from salesman
+            WHERE city='Paris';
+
+9.	Find the highest grade for each of the cities of the customers.
+ANS:- SELECT city, MAX(grade)
+      FROM customer 
+        GROUP BY city;
+
+10.	Find the highest purchase amount ordered by the each customer with their ID and highest purchase amount.
+ANS:- SELECT customer_id, MAX(purch_amt)
+          FROM orders
+       GROUP BY customer_id;

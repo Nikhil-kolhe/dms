@@ -1,0 +1,20 @@
+1.select price,type from room where h_no=(select h_no from hotel where h_name='Grosvenor');
+
+2.select * from guest where g_no in (select g_no from booking where d_f<=current_date and 
+d_t>=current_date and h_no=(select h_no from hotel where h_name='Grosvenor'));
+
+3.create view roomcc(h_no,r_no,type,price,name)as select r.h_no,r.r_no,r.type,r.price,g.name from 
+hotel h, room r,booking b,guest g where h.h_name='Grosvenor' and (b.d_f<=current_date and 
+b.d_t>=current_date) and h.h_no=r.h_no and r.h_no=b.h_no and r.r_no=b.r_no and b.g_no=g.g_no;
+
+create view roomca(h_no,r_no,type,price)as select r.h_no,r.r_no,r.type,r.price from hotel h,room r 
+where h.h_name='Grosvenor' and h.h_no=r.h_no;
+select r.r_no,r.h_no,r.type,r.price,p.name from roomca r left join roomcc p on r.r_no=p.r_no;
+
+4. select sum(price) from booking b,room r,hotel h where (b.d_f<=current_date and 
+b.d_t>=current_date) and r.h_no=h.h_no and r.h_no=b.h_no and r.r_no=b.r_no and 
+h.h_name='Grosvenor';
+5. select * from room r where r_no not in (select r_no from booking b,hotel h where 
+(d_f<=current_date and d_t>=current_date) and b.h_no=h.h_no and h_name='Grosvenor');
+6. select sum(price) from room r where r_no not in (select r_no from booking b,hotel h where 
+(d_f<=current_date and d_t>=current_date)and b.h_no=h.h_no and h_name='Grosvenor')

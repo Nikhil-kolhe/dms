@@ -1,0 +1,17 @@
+db.Student.insertMany([ {Name:'', Class:'', Address:'', Age: , Fees: }, 
+                        {Name:'', Class:'', Address:'', Age: , Fees: } ])
+-- Display student in one class
+db.student.find({Class:"TE"}).count()
+
+-- Display 
+db.Student1.aggregate([ {$group: {_id:'$Class',noofstud:{$sum:1}, maxAge:{$max:'$Age'}}} ])
+
+--Dispaly the Age greater than 20
+db.Student.aggregate([{$match:{Age:{$gt:20}}}])
+
+-- Sort on the Age
+db.Student.find().sort({Age:-1}).pretty()
+
+-- Display Index
+db.Student.createIndex({Name:1})
+

@@ -1,0 +1,122 @@
+
+MariaDB [(none)]> create database a_6;
+Query OK, 1 row affected (0.096 sec)
+
+MariaDB [(none)]> use a_6;
+Database changed
+MariaDB [a_6]> create table o_rollcall(id int(8),name varchar(255), address varchar(255));
+Query OK, 0 rows affected (0.765 sec)
+
+MariaDB [a_6]> desc o_rollcall;
++---------+--------------+------+-----+---------+-------+
+| Field   | Type         | Null | Key | Default | Extra |
++---------+--------------+------+-----+---------+-------+
+| id      | int(8)       | YES  |     | NULL    |       |
+| name    | varchar(255) | YES  |     | NULL    |       |
+| address | varchar(255) | YES  |     | NULL    |       |
++---------+--------------+------+-----+---------+-------+
+3 rows in set (0.011 sec)
+
+MariaDB [a_6]> create table n_rollcall(id int(8),name varchar(255), address varchar(255));
+Query OK, 0 rows affected (0.270 sec)
+
+MariaDB [a_6]> desc n_rollcall;
++---------+--------------+------+-----+---------+-------+
+| Field   | Type         | Null | Key | Default | Extra |
++---------+--------------+------+-----+---------+-------+
+| id      | int(8)       | YES  |     | NULL    |       |
+| name    | varchar(255) | YES  |     | NULL    |       |
+| address | varchar(255) | YES  |     | NULL    |       |
++---------+--------------+------+-----+---------+-------+
+3 rows in set (0.004 sec)
+
+MariaDB [a_6]> INSERT INTO o_rollcall VALUES(1,'Sumit','Pune');
+Query OK, 1 row affected (0.378 sec)
+
+MariaDB [a_6]> INSERT INTO o_rollcall VALUES(2,'MK','Ahmednagar');
+Query OK, 1 row affected (0.160 sec)
+
+MariaDB [a_6]> INSERT INTO o_rollcall VALUES(3,'Prasad','Beed');
+Query OK, 1 row affected (0.107 sec)
+
+MariaDB [a_6]> INSERT INTO o_rollcall VALUES(4,'Nihal','Lonavala');
+Query OK, 1 row affected (0.227 sec)
+
+MariaDB [a_6]> delimiter $
+MariaDB [a_6]> create procedure p3(IN roll1 int)
+    -> begin
+    -> declare roll2 int;
+    -> declare exit_loop boolean;
+    -> declare c1 cursor for select id from o_rollcall where id>roll1;
+    -> declare continue handler for not found set exit_loop=true;
+    -> open c1;
+    -> e_loop:loop
+    -> fetch c1 into roll2;
+    -> if not exists(select * from n_rollcall where id=roll2) then
+    -> INSERT INTO n_rollcall select * from o_rollcall where id=roll2;
+    -> end if;
+    -> if exit_loop
+    -> then
+    -> close c1;
+    -> leave e_loop;
+    -> end if;
+    -> end loop e_loop;
+    -> end
+    -> $
+Query OK, 0 rows affected (0.433 sec)
+
+MariaDB [a_6]> call p3(6)$
+Query OK, 0 rows affected (0.001 sec)
+
+MariaDB [a_6]> select * from n_rollcall$
+Empty set (0.000 sec)
+
+MariaDB [a_6]> select * from o_rollcall$
++------+--------+------------+
+| id   | name   | address    |
++------+--------+------------+
+|    1 | Sumit  | Pune       |
+|    2 | MK     | Ahmednagar |
+|    3 | Prasad | Beed       |
+|    4 | Nihal  | Lonavala   |
++------+--------+------------+
+4 rows in set (0.000 sec)
+
+MariaDB [a_6]> call p3(2)$
+Query OK, 2 rows affected (0.459 sec)
+
+MariaDB [a_6]> select * from n_rollcall$
++------+--------+----------+
+| id   | name   | address  |
++------+--------+----------+
+|    3 | Prasad | Beed     |
+|    4 | Nihal  | Lonavala |
++------+--------+----------+
+2 rows in set (0.000 sec)
+
+MariaDB [a_6]> call p3(2)$
+Query OK, 0 rows affected (0.001 sec)
+
+MariaDB [a_6]> select * from n_rollcall$
++------+--------+----------+
+| id   | name   | address  |
++------+--------+----------+
+|    3 | Prasad | Beed     |
+|    4 | Nihal  | Lonavala |
++------+--------+----------+
+2 rows in set (0.000 sec)
+
+MariaDB [a_6]> call p3(1)$
+Query OK, 1 row affected (0.378 sec)
+
+MariaDB [a_6]> select * from n_rollcall$
++------+--------+------------+
+| id   | name   | address    |
++------+--------+------------+
+|    3 | Prasad | Beed       |
+|    4 | Nihal  | Lonavala   |
+|    2 | MK     | Ahmednagar |
++------+--------+------------+
+3 rows in set (0.000 sec)
+
+MariaDB [a_6]> Bye

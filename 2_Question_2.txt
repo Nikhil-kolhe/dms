@@ -1,0 +1,44 @@
+
+1)Retrieve salesman id of all salesmen from orders table without any repeats.
+ANS:- SELECT DISTINCT salesman_id 
+         FROM orders;
+2. Display names and city of salesman, who belongs to the city of Paris.
+ANS:- SELECT name,city
+FROM salesman
+WHERE city='Paris';
+
+3. Display all the information for those customers with a grade of 200.
+ANS:- SELECT *
+FROM customer
+WHERE grade = 200;
+
+4.Display the order number, order date and the purchase amount for order(s) which will be delivered by the salesman with ID 5001.
+ANS:- SELECT ord_no, ord_date, purch_amt
+FROM orders
+WHERE salesman_id = 5001;
+
+5.Find all those customers with all information whose names are ending with the letter 'n'.
+ANS:- SELECT *
+FROM customer
+WHERE cust_name LIKE '%n';
+
+6. update city of salesman whose city is pune.
+ANS:-update salesman set city='Mumbai' where city='pune';
+
+7.Delete customer whose name is amit.
+ANS:- DELETE FROM customer WHERE name = 'amit';
+
+8. Find the total purchase amount of all orders.
+ANS:- SELECT SUM (purch_amt) 
+        FROM orders;
+
+9. . Find the highest purchase amount ordered by the each customer on a particular date with their ID, order date and highest purchase amount.
+ANS:- SELECT customer_id, MAX(purch_amt)
+        FROM orders
+       GROUP BY customer_id;
+
+10. Display all the customers, who are either belongs to the city New York or not had a grade above 100.
+ANS:- SELECT *
+        FROM customer
+      WHERE city = 'New York' OR NOT grade > 100;
+

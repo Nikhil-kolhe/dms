@@ -1,0 +1,5 @@
+db.Student_Marks.insertMany([ {Name:'', Class:'', Age:, Marks:}, {Name:'', Class:'', Age:, Marks:}, {Name:'', Class:'', Age:, Marks:}, {Name:'', Class:'', Age:, Marks:} ])
+var map = function(){emit(this.Age, this.Marks)}
+var reduce=function(Age,Marks){return Array.sum(Marks)}
+db.Student_Marks.mapReduce(map, reduce,{out:"resultcollection"})
+db.resultcollection.find()

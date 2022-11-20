@@ -1,0 +1,111 @@
+
+MariaDB [(none)]> CREATE DATABASE library;
+Query OK, 1 row affected (0.002 sec)
+
+MariaDB [(none)]> USE library;
+Database changed
+MariaDB [library]> create table Borrower(Roll_no int(8) Primary Key,Name varchar(255),Dateofissue date,Nameofbook varchar(255),Status varchar(255));
+Query OK, 0 rows affected (0.684 sec)
+
+MariaDB [library]> DESC Borrower;
++-------------+--------------+------+-----+---------+-------+
+| Field       | Type         | Null | Key | Default | Extra |
++-------------+--------------+------+-----+---------+-------+
+| Roll_no     | int(8)       | NO   | PRI | NULL    |       |
+| Name        | varchar(255) | YES  |     | NULL    |       |
+| Dateofissue | date         | YES  |     | NULL    |       |
+| Nameofbook  | varchar(255) | YES  |     | NULL    |       |
+| Status      | varchar(255) | YES  |     | NULL    |       |
++-------------+--------------+------+-----+---------+-------+
+5 rows in set (0.032 sec)
+
+MariaDB [library]> CREATE TABLE Fine(Roll_no int(8), Date date,Amt int(8),foreign key(Roll_no) references Borrower(Roll_no));
+Query OK, 0 rows affected (0.754 sec)
+
+MariaDB [library]> DESC Fine;
++---------+--------+------+-----+---------+-------+
+| Field   | Type   | Null | Key | Default | Extra |
++---------+--------+------+-----+---------+-------+
+| Roll_no | int(8) | YES  | MUL | NULL    |       |
+| Date    | date   | YES  |     | NULL    |       |
+| Amt     | int(8) | YES  |     | NULL    |       |
++---------+--------+------+-----+---------+-------+
+3 rows in set (0.005 sec)
+MariaDB [library]> INSERT INTO Borrower VALUES(101,'Sumit','2022-11-01','DBMS','I');
+Query OK, 1 row affected (0.396 sec)
+
+MariaDB [library]> INSERT INTO Borrower VALUES(102,'Sumit Pawar','2022-10-13','SPOS','I');
+Query OK, 1 row affected (0.384 sec)
+
+MariaDB [library]> INSERT INTO Borrower VALUES(103,'Nikhi','2022-09-26','MP','I');
+Query OK, 1 row affected (0.392 sec)
+
+MariaDB [library]> SELECT * FROM Borrower;
++---------+-------------+-------------+------------+--------+
+| Roll_no | Name        | Dateofissue | Nameofbook | Status |
++---------+-------------+-------------+------------+--------+
+|     101 | Sumit       | 2022-11-01  | DBMS       | I      |
+|     102 | Sumit Pawar | 2022-10-13  | SPOS       | I      |
+|     103 | Nikhi       | 2022-09-26  | MP         | I      |
++---------+-------------+-------------+------------+--------+
+3 rows in set (0.001 sec)
+
+MariaDB [library]> DELIMITER $
+MariaDB [library]> CREATE PROCEDURE calc_fine(in Roll int)
+    -> BEGIN
+    -> DECLARE fine int;
+    -> DECLARE noofdays int;
+    -> DECLARE issuedate date;
+    -> DECLARE exit handler for SQLEXCEPTION select'create table defination';
+    -> SELECT Dateofissue into issuedate from Borrower where Roll_no=Roll;
+    -> SELECT datediff(curdate(),issuedate) into noofdays;
+    -> if noofdays>15 and noofdays<30 then
+    -> SET fine = (noofdays-15)*5;
+    -> INSERT INTO Fine VALUES(Roll,curdate(),fine);
+    -> elseif noofdays>=30 then
+    -> SET fine = ((noofdays-30)*50)+15*5;
+    -> INSERT INTO Fine VALUES(Roll,curdate(),fine);
+    -> else
+    -> INSERT INTO Fine VALUES(Roll,curdate(),0);
+    -> end if;
+    -> UPDATE Borrower SET Status='R' where Roll_no=Roll;
+    -> end;
+    -> $
+Query OK, 0 rows affected (0.480 sec)
+
+MariaDB [library]> CALL calc_fine(101)$
+Query OK, 4 rows affected (0.495 sec)
+
+MariaDB [library]> SELECT * FROM Fine$
++---------+------------+------+
+| Roll_no | Date       | Amt  |
++---------+------------+------+
+|     101 | 2022-11-19 |   15 |
++---------+------------+------+
+1 row in set (0.000 sec)
+
+MariaDB [library]> CALL calc_fine(102)$
+Query OK, 4 rows affected (0.566 sec)
+
+MariaDB [library]> CALL calc_fine(103)$
+Query OK, 4 rows affected (0.075 sec)
+
+MariaDB [library]> SELECT * FROM Fine$
++---------+------------+------+
+| Roll_no | Date       | Amt  |
++---------+------------+------+
+|     101 | 2022-11-19 |   15 |
+|     102 | 2022-11-19 |  425 |
+|     103 | 2022-11-19 | 1275 |
++---------+------------+------+
+3 rows in set (0.001 sec)
+
+MariaDB [library]> CALL calc_fine('abx')$
++-------------------------+
+| create table defination |
++-------------------------+
+| create table defination |
++-------------------------+
+1 row in set (0.415 sec)
+
+Query OK, 1 row affected, 1 warning (0.424 sec)

@@ -1,0 +1,50 @@
+// Create two tables borrower & libaudit. insert values in borrower
+// Syntax for Trigger :-
+
+> delimiter $
+->create trigger backup after insert on borrower1 for each row                                         
+-> begin                                                                                                
+-> insert into libaudit values(new.id,new.name,new.issuedate,new.status);                               
+-> end $ 
+
+// Values will be displayed in both tables :-
+> select * from libaudit;
+->$
+
+// Syntax to create next Trigger:-
+>delimiter $                                       
+> create trigger data after delete on borrower for each row                                            
+-> begin                                                                                                
+-> insert into libaudit values(old.id,old.name,old.issuedate,old.status);                                
+-> end $ 
+
+// Perform a delete operation on borrower table :-
+>delete from borrower1 where id=1;                                                                    
+-> $
+
+//Check the deleted syntax :-
+>select * from borrower1;                                                                             
+-> $
+
+select * from libaudit;
+-> $
+
+//Sytnax to create Trigger for update :-
+> delimiter $                                                                                     
+> create trigger data1 after update on borrower1 for each row                                          
+-> begin                                                                                                
+-> insert into libaudit values(new.id,new.name,new.issuedate,new.status);                               
+-> end $
+
+// Perform update operation on borrower table :-
+> update borrower set name='Onkar'                                                                     
+-> where borrower1.id=3;                                                                                
+-> $
+
+// Check updated values in borrower table :-
+>select * from borrower1;                                                                             
+-> $
+
+// Check values from libaudit table :-
+select * from libaudit;
+-> $

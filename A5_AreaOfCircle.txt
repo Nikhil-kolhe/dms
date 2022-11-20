@@ -1,0 +1,59 @@
+MariaDB [(none)]> CREATE DATABASE A_5;
+Query OK, 1 row affected (0.001 sec)
+
+MariaDB [(none)]> USE A_5;
+Database changed
+MariaDB [A_5]> CREATE TABLE areas(radius float, area float);
+Query OK, 0 rows affected (0.583 sec)
+
+MariaDB [A_5]> DESC areas;
++--------+-------+------+-----+---------+-------+
+| Field  | Type  | Null | Key | Default | Extra |
++--------+-------+------+-----+---------+-------+
+| radius | float | YES  |     | NULL    |       |
+| area   | float | YES  |     | NULL    |       |
++--------+-------+------+-----+---------+-------+
+2 rows in set (0.028 sec)
+
+MariaDB [A_5]> DELIMITER $
+MariaDB [A_5]> CREATE PROCEDURE CalArea(IN rad float)
+    -> BEGIN
+    -> DECLARE radiusBound condition for sqlstate '45000';
+    -> if(rad>9 || rad<5) then
+    -> signal sqlstate '45000' set message_text = 'radius is not between 5 and 9';
+    -> else
+    -> INSERT INTO areas VALUES(rad, 3.14*rad*rad);
+    -> end if;
+    -> end;
+    -> $
+Query OK, 0 rows affected (0.438 sec)
+
+MariaDB [A_5]> select * from areas$
+Empty set (0.000 sec)
+
+MariaDB [A_5]> CALL CalArea(4.87)$
+ERROR 1644 (45000): radius is not between 5 and 9
+MariaDB [A_5]> CALL CalArea(5.87)$
+Query OK, 1 row affected (0.398 sec)
+
+MariaDB [A_5]> select * from areas$
++--------+---------+
+| radius | area    |
++--------+---------+
+|   5.87 | 108.195 |
++--------+---------+
+1 row in set (0.000 sec)
+
+MariaDB [A_5]> CALL CalArea(7.8)$
+Query OK, 1 row affected (0.127 sec)
+
+MariaDB [A_5]> select * from areas$
++--------+---------+
+| radius | area    |
++--------+---------+
+|   5.87 | 108.195 |
+|    7.8 | 191.038 |
++--------+---------+
+2 rows in set (0.000 sec)
+
+MariaDB [A_5]>
